@@ -1,47 +1,5 @@
-import { useState } from 'react';
-
-const articoli = [
-    {
-      id: 1,
-      name: "Introduzione a JavaScript",
-      autore: "Mario Rossi",
-      description: "JavaScript è un linguaggio di programmazione utilizzato per lo sviluppo web...",
-      categoria: "Programmazione",
-      available: true,
-    },
-    {
-      id: 2,
-      name: "CSS: Stili e Layout",
-      autore: "Luca Bianchi",
-      description: "CSS permette di definire lo stile e il layout di una pagina web...",
-      categoria: "Web Design",
-      available: true,
-    },
-    {
-      id: 3,
-      name: "React: Guida per Principianti",
-      autore: "Giulia Verdi",
-      description: "React è una libreria JavaScript per la creazione di interfacce utente...",
-      categoria: "Programmazione",
-      available: true,
-    },
-    {
-      id: 4,
-      name: "SEO per Principianti",
-      autore: "Anna Neri",
-      description: "L'ottimizzazione per i motori di ricerca è essenziale per aumentare la visibilità online...",
-      categoria: "Marketing",
-      available: true,
-    },
-    {
-      id: 5,
-      name: "Node.js e lo Sviluppo Backend",
-      autore: "Marco De Luca",
-      description: "Node.js permette di creare applicazioni server-side veloci e scalabili...",
-      categoria: "Programmazione",
-      available: true,
-    }
-  ];
+import { useState, useEffect } from 'react';
+import axios from "axios";
 // componente
 export default function Main() {
     const initialFormData = {
@@ -53,10 +11,24 @@ export default function Main() {
     };
 
     // stato dei articoli
-    const [articoliWeb, setArticoliWeb] = useState(articoli);
+    const [articoliWeb, setArticoliWeb] = useState([]);
 
     // stato del imput del articolo
     const [nuovoArticolo, setNuovoArticolo] = useState(initialFormData);
+
+    // funzione di gestione chiamata all'API
+    function fetchPizzas() {
+        axios.get("http://localhost:3000/piatti/")
+            .then((res) =>
+                setArticoliWeb(res.data)
+                // console.log(res.data)
+            )
+    }
+
+    // richiamo la funzione di richiesta dati al caricamento del componente
+    // fetchPizzas();
+    // Solo al primo rendering
+    useEffect(fetchPizzas, []);
 
    // funzione di gestione delle info dei campi
    function handlenuovoArticolo(e) {
@@ -142,11 +114,12 @@ export default function Main() {
 {
     articoliWeb.map((articolo) => (
         <div className='articoloItem' key={articolo.id}>
-            <h2>{articolo.name}</h2>
-            <p>{articolo.autore}</p>
-            <p>{articolo.description}</p>
-            <span className='categoria'>{articolo.categoria} </span>
-            <span className='available'>{articolo.available ? "articolo disponibile" : "articolo non disponibile"}</span>
+            <h2>{articolo.title}</h2>
+            <p>{articolo.content}</p>
+            <img src={articolo.image} alt={articolo.title} />
+            <p>{articolo.tags.join(", ")}</p>
+            {/* <span className='categoria'>{articolo.categoria} </span>
+            <span className='available'>{articolo.available ? "articolo disponibile" : "articolo non disponibile"}</span> */}
             <br />
             <button onClick={() => deleteArticolo(articolo.id)}>
                 Cancella
