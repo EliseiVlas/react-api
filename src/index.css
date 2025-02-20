@@ -1,0 +1,29 @@
+input, textarea, label{
+  display: block;
+  margin: 5px;
+  border: 3px solid black;
+}
+.articoloItem{
+border: 3px solid black;
+margin-bottom: 20px;
+padding: 0px 0px 20px 20px;
+border-radius: 20px;
+margin-top: 20px;
+width: 50%;
+}
+form{
+  border: 3px solid black;
+  width: 15%;
+  border-radius: 20px;
+  padding: 10px;
+}
+button{
+  padding: 10px 20px;
+  background-color: rgb(67, 153, 252);
+  color: white;
+  margin-top: 5px;
+  border-radius: 10px;
+}
+img{
+  width: 50%;
+}
