@@ -2,56 +2,54 @@ import { useState, useEffect } from 'react';
 import axios from "axios";
 // componente
 export default function Main() {
-    const initialFormData = {
-        name: "",
-        autore: "",
-        description: "",
-        categoria: "",
-        available: false,
+    const initialnuovoArticolo = {
+        title: "",
+        content: "",
+        image: "",
+        tags: [],
     };
 
-    // stato dei articoli
+    // stato dei piatti
     const [articoliWeb, setArticoliWeb] = useState([]);
 
-    // stato del imput del articolo
-    const [nuovoArticolo, setNuovoArticolo] = useState(initialFormData);
+    // stato del imput del piatto
+    const [nuovoArticolo, setNuovoArticolo] = useState(initialnuovoArticolo);
 
     // funzione di gestione chiamata all'API
-    function fetchPizzas() {
+    function fetchPiatti() {
         axios.get("http://localhost:3000/piatti/")
             .then((res) =>
                 setArticoliWeb(res.data)
-                // console.log(res.data)
             )
     }
 
-    // richiamo la funzione di richiesta dati al caricamento del componente
-    // fetchPizzas();
     // Solo al primo rendering
-    useEffect(fetchPizzas, []);
+    useEffect(fetchPiatti, []);
 
    // funzione di gestione delle info dei campi
    function handlenuovoArticolo(e) {
-        // gestione del value a seconda del tipo di input
-        const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+       // gestione del value a seconda del tipo di input
+       const value = e.target.name === "tags" ? e.target.value.split(",") : e.target.value;
 
-        // setta tramite setState l'oggetto con le info prese dai campi del form
-        setNuovoArticolo((currentFormData) => ({
-            ...currentFormData,
-            [e.target.name]: value,
+       // setta tramite setState l'oggetto con le info prese dai campi del form
+       setNuovoArticolo((currentNuovoArticolo) => ({
+           ...currentNuovoArticolo,
+           [e.target.name]: value,
         }));
    }
 
        // funzione di gestione dell'invio dell'intero form (tuue le info dei vari campi)
     function handleSubmit(e) {
-        e.preventDefault();
-        setArticoliWeb((currentMenu) => [...currentMenu, {
-            id:
-                currentMenu.length === 0 ? 1 : currentMenu[currentMenu.length - 1].id + 1,
-            ...nuovoArticolo
-        }]);
+        // chiamata verso la API in post con invio dati nuovo piatto
+        axios.post("http://localhost:3000/piatti/", nuovoArticolo)
+            .then(res => {
+                // uso la risposta dell'API per creare il nuovo array menu
+                setArticoliWeb((currentArticoliWeb) => [...currentArticoliWeb, res.data])
+            }
+            )
+            .catch(err => console.log(err))
         // resetto il form
-        setNuovoArticolo(initialFormData);
+        setNuovoArticolo(initialnuovoArticolo);
     }
     // funzione gestione cancellazione articolo
     function deleteArticolo(idArticolo) {
@@ -59,55 +57,53 @@ export default function Main() {
         const updateArticle = articoliWeb.filter((articolo) => {
             return articolo.id !== idArticolo;
         })
-        // lo sostituiamo
-        setArticoliWeb(updateArticle);
+        // chiamata ad API sulla rotta di delete
+        axios.delete(`http://localhost:3000/piatti/${idArticolo}`)
+            .then(res =>
+                console.log(res),
+                // lo sostituiamo anche nel FE
+                setArticoliWeb(updateArticle)
+            )
+            .catch(err => console.log(err))
     }
     return (
         <> 
         <h1>Questo e il form deli articoli</h1>
 
 <form id='formarticolo' action="#" onSubmit={handleSubmit}>
-    {/* valore nome articolo */}
+    {/* valore nome piatto */}
     <input
         type="text"
-        name="name"
+        name="title"
         onChange={handlenuovoArticolo}
-        value={nuovoArticolo.name}
-        placeholder='Nome autore'
+        value={nuovoArticolo.title}
+        placeholder='Nome piatto'
     />
-    {/* valore autore */}
-    <input
-        type="text"
-        name="autore"
+     {/* valore descrizione */}
+     <textarea
+        name="content"
         onChange={handlenuovoArticolo}
-        value={nuovoArticolo.autore}
-        placeholder='autore'
-    />
-    {/* valore descrizione */}
-    <textarea
-        name="description"
-        onChange={handlenuovoArticolo}
-        value={nuovoArticolo.description}
-        placeholder='Descrizione autore'
+        value={nuovoArticolo.content}
+        placeholder='Descrizione piatto'
     ></textarea>
-    {/* valore categoria */}
+    {/* valore immagine */}
     <input
         type="text"
-        name="categoria"
+        name="image"
         onChange={handlenuovoArticolo}
-        value={nuovoArticolo.categoria}
-        placeholder='Categoria'
+        value={nuovoArticolo.image}
+        placeholder='URL immagina'
     />
-    {/* valore disponibilità */}
-    <label htmlFor="available">Disponibile</label>
+   
+    {/* valore ingredienti */}
     <input
-        type="checkbox"
-        name="available"
-        checked={nuovoArticolo.available}
+        type="text"
+        name="tags"
         onChange={handlenuovoArticolo}
-        id="available"
+        value={nuovoArticolo.tags}
+        placeholder='Ingredienti piatto'
     />
-    {/* bottone di invio info */}
+ 
     <button>Aggiungi</button>
 </form>
 
